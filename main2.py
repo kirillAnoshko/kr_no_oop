@@ -1,4 +1,5 @@
 from os import system
+from random import choice
 
 
 class Player:
@@ -6,7 +7,7 @@ class Player:
         self.image = image
         self.is_automatic = is_automatic
 
-    def make_move(self, field):
+    def make_move(self, field):        
         if not self.is_automatic:
             while True:
                 try:
@@ -22,6 +23,14 @@ class Player:
                     print('Ошибка! Эта клетка занята!')
                 break
         field.cells[index] = self.image
+
+        if self.is_automatic:
+            free_cells_indexes = []
+            for i in range(9):
+                if isinstance(field.cells[i], int):
+                    free_cells_indexes.append(i)
+            random_index = choice(free_cells_indexes)
+            field.cells[index] = self.image
 
 
 class Field:
@@ -40,13 +49,32 @@ class Game:
         self.player_2 = Player(image='0', is_automatic=False)
         self.field = Field()
 
+    def get_winner(self) -> str:
+        for i in range(0, 7, 3):
+            if self.field.cells[i] == self.field.cells[i + 1] == self.field.cells[i + 2]:
+                return self.field.cells[i]
+
+        for i in range(3):
+            if self.field.cells[i] == self.field.cells[i + 3] == self.field.cells[i + 2]:
+                return self.field.cells[i]
+
+        return ''
+
     def run(self):
+        turn = 1
         while True:
+            if turn > 9:
+                print('Ничья!')
+                break
             self.field.draw()
-            if: # Нечетный ход
+            if turn % 2: # Нечетный ход
                 self.player_1.make_move(self.field)
             else: # Четный ход
                 self.player_2.make_move(self.field)
+            turn += 1
+            winner = self.get_winner()
+            if winner:
+                print(f'Победил {winner}')
 
 
 class App:
